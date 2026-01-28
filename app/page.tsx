@@ -2,6 +2,26 @@ import { client } from "@/lib/shopify/serverClient";
 import { getAllProducts } from "@/lib/shopify/graphql/products";
 import { ProductGrid } from "./components/ProductGrid";
 
+type ProductEdge = {
+  node: {
+    id: string;
+    handle: string;
+    title: string;
+    featuredImage?: {
+      url: string;
+      altText?: string | null;
+      width?: number | null;
+      height?: number | null;
+    } | null;
+    priceRange: {
+      minVariantPrice: {
+        amount: string;
+        currencyCode: string;
+      };
+    };
+  };
+};
+
 export default async function Home() {
   const resp = await client.request(getAllProducts, {
     variables: {
@@ -9,7 +29,7 @@ export default async function Home() {
     }
   });
   console.log(resp)  
-  const products = resp.data?.products?.edges.map(edge => edge.node) || [];
+  const products = resp.data?.products?.edges.map((edge: ProductEdge) => edge.node) || [];
 
   return (
     <main className="min-h-screen p-8 bg-white">
